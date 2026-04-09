@@ -4,7 +4,7 @@
 
 <br/>
 
-<img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=700&size=20&pause=1000&color=BB88FF&center=true&vCenter=true&width=800&lines=Research+Lab+Aesthetic+%7C+Dark+%26+Precise;Drag+%26+Drop+Paper+Analysis;Real-Time+Integrity+Reports;Built+with+Next.js+15+%2B+TypeScript" />
+<img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=700&size=20&pause=1000&color=BB88FF&center=true&vCenter=true&width=800&lines=6+Module+Integrity+Analysis+Interface;Research+Lab+Aesthetic+%7C+Dark+%26+Precise;Real-Time+Forensic+Reports;Built+with+Next.js+15+%2B+TypeScript" />
 
 <br/><br/>
 
@@ -38,23 +38,24 @@
 
 ## What Is This
 
-This is the official web interface for **SciPeerAI** — the automated scientific integrity analysis system.
+This is the official web interface for **SciPeerAI** — the automated scientific integrity analysis system with 6 analytical modules.
 
-Paste any paper text and receive a structured, multi-dimensional forensic report across three analytical dimensions — in seconds. No technical knowledge required.
+Paste any paper text and receive a structured, multi-dimensional forensic report — in seconds. No technical knowledge required.
 
 **Live:** [scipeerai-ui.vercel.app](https://scipeerai-ui.vercel.app)
+**Backend:** [web-production-f526d.up.railway.app](https://web-production-f526d.up.railway.app)
 
 ---
 
-## Interface
+## Interface Overview
+
 ```
 SYSTEM ONLINE // INTEGRITY ENGINE ACTIVE
 
 /// PROTOCOL: INTEGRITY ANALYSIS
 
 SciPeerAI
-
-4 Modules  ·  27 Tests  ·  5 Endpoints  ·  Live
+6 Modules · 45 Tests · 7 Endpoints · Live
 
 ANALYSIS DIMENSIONS:
 EXPERIMENT 01 — Statistical Audit
@@ -63,6 +64,7 @@ EXPERIMENT 03 — Citation Integrity
 
 [INPUT TERMINAL]
 Paste paper text here...
+Author name (optional)
 
 [INITIALIZE INTEGRITY SCAN]
 
@@ -70,24 +72,25 @@ AGGREGATE INTEGRITY ASSESSMENT
 Overall Risk Score: XX%
 
 DETAILED ANALYSIS REPORT
-Module results with flags, evidence, suggestions
+Per-module flags, evidence, suggestions
 ```
 
 ---
 
 ## Design Philosophy
 
-Inspired by the aesthetic of professional research terminals — precise, dark, institutional. Not a consumer app. Built for researchers, journal editors, and scientific reviewers who work with data daily.
+Inspired by the aesthetic of professional research terminals — precise, dark, institutional. Built for researchers, journal editors, and scientific reviewers.
 
-- `/// PROTOCOL:` header — matches research lab documentation style
-- `EXPERIMENT 01, 02, 03` — mirrors scientific nomenclature
-- Monospace typography — Space Mono — engineering precision
-- Risk bars with color-coded severity — red/orange/yellow/green
+- `/// PROTOCOL:` — research lab documentation style
+- `EXPERIMENT 01, 02, 03` — scientific nomenclature
+- Space Mono typography — engineering precision
+- Color-coded risk bars — red/orange/yellow/green
 - Expandable flag cards — evidence + suggestion on demand
 
 ---
 
 ## Quick Start
+
 ```bash
 git clone https://github.com/Abu-Sameer-66/SciPeerAI-UI.git
 cd SciPeerAI-UI
@@ -95,11 +98,11 @@ npm install
 ```
 
 Create `.env.local`:
+
 ```
 NEXT_PUBLIC_API_URL=https://web-production-f526d.up.railway.app
 ```
 
-Run:
 ```bash
 npm run dev
 ```
@@ -116,36 +119,35 @@ Open `http://localhost:3000`
 | Language | TypeScript |
 | Styling | Tailwind CSS + inline styles |
 | HTTP | Axios |
-| Typography | Space Mono (Google Fonts) |
+| Typography | Space Mono |
 | Deployment | Vercel |
-| Backend | SciPeerAI FastAPI (Railway) |
+| Backend | SciPeerAI FastAPI on Railway |
 
 ---
 
 ## API Integration
 
-This UI connects to the SciPeerAI backend. Three endpoints are called per analysis:
 ```
-POST /api/v1/analyze/statistics  → Statistical fraud detection
-POST /api/v1/analyze/methodology → Methodology logic check
-POST /api/v1/analyze/citations   → Citation integrity audit
+POST /api/v1/analyze/statistics     → Statistical fraud
+POST /api/v1/analyze/methodology    → Methodology logic
+POST /api/v1/analyze/citations      → Citation integrity
+POST /api/v1/analyze/figures        → Figure forensics
+POST /api/v1/analyze/reproducibility → Reproducibility
+POST /api/v1/analyze/novelty        → Novelty scoring
 ```
-
-Backend repo: [github.com/Abu-Sameer-66/SciPeerAI](https://github.com/Abu-Sameer-66/SciPeerAI)
 
 ---
 
 ## Roadmap
 
-- [x] Core analysis dashboard
-- [x] Three-module integration
+- [x] 3-module analysis dashboard
 - [x] Risk score visualization
-- [x] Expandable flag cards with evidence
+- [x] Expandable flag cards
 - [x] Vercel deployment
-- [ ] PDF drag & drop upload
-- [ ] Figure forensics visual output
+- [ ] All 6 modules in UI
+- [ ] PDF drag & drop
 - [ ] Report PDF export
-- [ ] Dark/light theme toggle
+- [ ] SciPeerAI-7B integration
 
 ---
 
