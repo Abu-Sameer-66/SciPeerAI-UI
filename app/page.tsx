@@ -170,7 +170,10 @@ export default function Home() {
         if (m.id === "citations")       payload.author_name = author;
         if (m.id === "methodology")     payload.abstract = "";
         if (m.id === "novelty")         payload.title = "";
-        const { data } = await axios.post(`${API}${m.endpoint}`, payload);
+        const { data } = await axios.post(`${API}${m.endpoint}`, payload, {
+          timeout: 30000,
+          headers: { "Content-Type": "application/json" }
+        });
         out.push({
           module:      m.label,
           risk_level:  data.risk_level,
