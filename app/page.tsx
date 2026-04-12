@@ -164,8 +164,9 @@ export default function Home() {
     const out: Result[] = [];
     for (const m of MODULES) {
       setStep(`Running ${m.label}...`);
-      try {
-        const payload: Record<string, string> = { text };
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      const payload: Record<string, string> = { text };
         if (m.id === "citations")       payload.author_name = author;
         if (m.id === "methodology")     payload.abstract = "";
         if (m.id === "novelty")         payload.title = "";
