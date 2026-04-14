@@ -9,8 +9,7 @@ import {
   RefreshCw, Sparkles
 } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
-
+const API = "https://web-production-f526d.up.railway.app";
 interface Flag {
   flag_type: string;
   severity: string;
