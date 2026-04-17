@@ -176,7 +176,7 @@ export default function Home() {
         out.push({
           module:      m.label,
           risk_level:  data.risk_level,
-          risk_score:  data.risk_score,
+          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? 0,
           summary:     data.summary,
           flags:       data.flags || [],
           flags_count: data.flags_count || 0,
