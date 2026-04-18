@@ -37,6 +37,7 @@ const MODULES = [
   { id: "grim",            label: "GRIM Test",              icon: AlertTriangle, endpoint: "/api/v1/analyze/grim",            desc: "impossible means · data fabrication" },
   { id: "sprite",          label: "SPRITE Test",            icon: CheckCircle2,  endpoint: "/api/v1/analyze/sprite",          desc: "impossible distributions · SD verification" },
   { id: "granularity",     label: "Granularity Analyzer",   icon: BarChart3,     endpoint: "/api/v1/analyze/granularity",     desc: "digit preference · Benford law · round numbers" },
+  { id: "pcurve",          label: "P-Curve Analyzer",       icon: BarChart3,     endpoint: "/api/v1/analyze/pcurve",          desc: "publication bias · p-value clustering" },
 ];
 
 function RiskBar({ score, level }: { score: number; level: string }) {
@@ -176,14 +177,15 @@ export default function Home() {
         if (m.id === "grim")         payload.title = "";
         if (m.id === "sprite")       payload.title = "";
         if (m.id === "granularity")  payload.title = "";
+        if (m.id === "pcurve")       payload.title = "";
         const { data } = await axios.post(`${API}${m.endpoint}`, payload, {
-          timeout: 30000,
+          timeout: 35000,
           headers: { "Content-Type": "application/json" }
         });
         out.push({
           module:      m.label,
           risk_level:  data.risk_level,
-          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? 0,
+          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? data.pcurve_score ?? 0,
           summary:     data.summary,
           flags:       data.flags || [],
           flags_count: data.flags_count || 0,
@@ -258,9 +260,9 @@ export default function Home() {
             Automated scientific integrity analysis. Upload paper text and receive a structured, multi-dimensional forensic report — in seconds.
           </p>
           <div style={{ display: "flex", gap: 40, padding: "20px 0", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <StatPill value="9"    label="Modules" />
-            <StatPill value="69"   label="Tests Passing" />
-            <StatPill value="10"   label="API Endpoints" />
+            <StatPill value="10"   label="Modules" />
+            <StatPill value="77"   label="Tests Passing" />
+            <StatPill value="11"   label="API Endpoints" />
             <StatPill value="Live" label="Deployed" />
           </div>
         </div>
@@ -372,7 +374,7 @@ export default function Home() {
               onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(56,189,248,0.4)")}>
               SAMEER NADEEM
             </a>
-            {" "}// SciPeerAI v1.3.0 // 9 MODULES // BUILDING INTELLIGENCE
+            {" "}// SciPeerAI v1.4.0 // 10 MODULES // BUILDING INTELLIGENCE
           </div>
         </div>
 
