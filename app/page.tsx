@@ -29,16 +29,17 @@ interface Result {
 }
 
 const MODULES = [
-  { id: "statistics",   label: "Statistical Audit",      icon: BarChart3,     endpoint: "/api/v1/analyze/statistics",      desc: "p-hacking · sample size · round numbers" },
-  { id: "methodology",  label: "Methodology Checker",    icon: FlaskConical,  endpoint: "/api/v1/analyze/methodology",     desc: "causation · control groups · timeframe" },
-  { id: "citations",    label: "Citation Integrity",     icon: Quote,         endpoint: "/api/v1/analyze/citations",       desc: "self-citation · unsupported claims" },
-  { id: "reproducibility", label: "Reproducibility Scan", icon: RefreshCw,   endpoint: "/api/v1/analyze/reproducibility", desc: "code · data · ethics · preregistration" },
-  { id: "novelty",      label: "Novelty Scorer",         icon: Sparkles,      endpoint: "/api/v1/analyze/novelty",         desc: "literature search · novelty estimation" },
-  { id: "grim",         label: "GRIM Test",              icon: AlertTriangle, endpoint: "/api/v1/analyze/grim",            desc: "impossible means · data fabrication" },
-  { id: "sprite",       label: "SPRITE Test",            icon: CheckCircle2,  endpoint: "/api/v1/analyze/sprite",          desc: "impossible distributions · SD verification" },
-  { id: "granularity",  label: "Granularity Analyzer",   icon: BarChart3,     endpoint: "/api/v1/analyze/granularity",     desc: "digit preference · Benford law · round numbers" },
-  { id: "pcurve",       label: "P-Curve Analyzer",       icon: BarChart3,     endpoint: "/api/v1/analyze/pcurve",          desc: "publication bias · p-value clustering" },
-  { id: "effect_size",  label: "Effect Size Validator",  icon: BarChart3,     endpoint: "/api/v1/analyze/effect_size",     desc: "Cohen d · power analysis · inflated effects" },
+  { id: "statistics",      label: "Statistical Audit",      icon: BarChart3,     endpoint: "/api/v1/analyze/statistics",      desc: "p-hacking · sample size · round numbers" },
+  { id: "methodology",     label: "Methodology Checker",    icon: FlaskConical,  endpoint: "/api/v1/analyze/methodology",     desc: "causation · control groups · timeframe" },
+  { id: "citations",       label: "Citation Integrity",     icon: Quote,         endpoint: "/api/v1/analyze/citations",       desc: "self-citation · unsupported claims" },
+  { id: "reproducibility", label: "Reproducibility Scan",   icon: RefreshCw,     endpoint: "/api/v1/analyze/reproducibility", desc: "code · data · ethics · preregistration" },
+  { id: "novelty",         label: "Novelty Scorer",         icon: Sparkles,      endpoint: "/api/v1/analyze/novelty",         desc: "literature search · novelty estimation" },
+  { id: "grim",            label: "GRIM Test",              icon: AlertTriangle, endpoint: "/api/v1/analyze/grim",            desc: "impossible means · data fabrication" },
+  { id: "sprite",          label: "SPRITE Test",            icon: CheckCircle2,  endpoint: "/api/v1/analyze/sprite",          desc: "impossible distributions · SD verification" },
+  { id: "granularity",     label: "Granularity Analyzer",   icon: BarChart3,     endpoint: "/api/v1/analyze/granularity",     desc: "digit preference · Benford law · round numbers" },
+  { id: "pcurve",          label: "P-Curve Analyzer",       icon: BarChart3,     endpoint: "/api/v1/analyze/pcurve",          desc: "publication bias · p-value clustering" },
+  { id: "effect_size",     label: "Effect Size Validator",  icon: BarChart3,     endpoint: "/api/v1/analyze/effect_size",     desc: "Cohen d · power analysis · inflated effects" },
+  { id: "retraction",      label: "Retraction Checker",     icon: AlertTriangle, endpoint: "/api/v1/analyze/retraction",      desc: "retracted citations · CrossRef live API" },
 ];
 
 function RiskBar({ score, level }: { score: number; level: string }) {
@@ -180,6 +181,7 @@ export default function Home() {
         if (m.id === "granularity")  payload.title = "";
         if (m.id === "pcurve")       payload.title = "";
         if (m.id === "effect_size")  payload.title = "";
+        if (m.id === "retraction")   payload.title = "";
         const { data } = await axios.post(`${API}${m.endpoint}`, payload, {
           timeout: 35000,
           headers: { "Content-Type": "application/json" }
@@ -187,7 +189,7 @@ export default function Home() {
         out.push({
           module:      m.label,
           risk_level:  data.risk_level,
-          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? data.pcurve_score ?? data.effect_score ?? 0,
+          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? data.pcurve_score ?? data.effect_score ?? data.retraction_score ?? 0,
           summary:     data.summary,
           flags:       data.flags || [],
           flags_count: data.flags_count || 0,
@@ -262,9 +264,9 @@ export default function Home() {
             Automated scientific integrity analysis. Upload paper text and receive a structured, multi-dimensional forensic report — in seconds.
           </p>
           <div style={{ display: "flex", gap: 40, padding: "20px 0", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <StatPill value="11"   label="Modules" />
-            <StatPill value="85"   label="Tests Passing" />
-            <StatPill value="12"   label="API Endpoints" />
+            <StatPill value="12"   label="Modules" />
+            <StatPill value="93"   label="Tests Passing" />
+            <StatPill value="13"   label="API Endpoints" />
             <StatPill value="Live" label="Deployed" />
           </div>
         </div>
@@ -376,7 +378,7 @@ export default function Home() {
               onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(56,189,248,0.4)")}>
               SAMEER NADEEM
             </a>
-            {" "}// SciPeerAI v1.5.0 // 11 MODULES // BUILDING INTELLIGENCE
+            {" "}// SciPeerAI v1.6.0 // 12 MODULES // BUILDING INTELLIGENCE
           </div>
         </div>
 
