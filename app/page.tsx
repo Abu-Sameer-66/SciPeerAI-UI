@@ -40,6 +40,7 @@ const MODULES = [
   { id: "pcurve",          label: "P-Curve Analyzer",       icon: BarChart3,     endpoint: "/api/v1/analyze/pcurve",          desc: "publication bias · p-value clustering" },
   { id: "effect_size",     label: "Effect Size Validator",  icon: BarChart3,     endpoint: "/api/v1/analyze/effect_size",     desc: "Cohen d · power analysis · inflated effects" },
   { id: "retraction",      label: "Retraction Checker",     icon: AlertTriangle, endpoint: "/api/v1/analyze/retraction",      desc: "retracted citations · CrossRef live API" },
+  { id: "cartel",          label: "Citation Cartel",        icon: Quote,         endpoint: "/api/v1/analyze/cartel",          desc: "citation rings · network manipulation" },
 ];
 
 function RiskBar({ score, level }: { score: number; level: string }) {
@@ -182,6 +183,7 @@ export default function Home() {
         if (m.id === "pcurve")       payload.title = "";
         if (m.id === "effect_size")  payload.title = "";
         if (m.id === "retraction")   payload.title = "";
+        if (m.id === "cartel")       payload.title = "";
         const { data } = await axios.post(`${API}${m.endpoint}`, payload, {
           timeout: 35000,
           headers: { "Content-Type": "application/json" }
@@ -189,7 +191,7 @@ export default function Home() {
         out.push({
           module:      m.label,
           risk_level:  data.risk_level,
-          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? data.pcurve_score ?? data.effect_score ?? data.retraction_score ?? 0,
+          risk_score:  data.risk_score ?? data.reproducibility_score ?? data.novelty_score ?? data.grim_score ?? data.sprite_score ?? data.granularity_score ?? data.pcurve_score ?? data.effect_score ?? data.retraction_score ?? data.cartel_score ?? 0,
           summary:     data.summary,
           flags:       data.flags || [],
           flags_count: data.flags_count || 0,
@@ -264,9 +266,9 @@ export default function Home() {
             Automated scientific integrity analysis. Upload paper text and receive a structured, multi-dimensional forensic report — in seconds.
           </p>
           <div style={{ display: "flex", gap: 40, padding: "20px 0", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-            <StatPill value="12"   label="Modules" />
-            <StatPill value="93"   label="Tests Passing" />
-            <StatPill value="13"   label="API Endpoints" />
+            <StatPill value="13"   label="Modules" />
+            <StatPill value="101"  label="Tests Passing" />
+            <StatPill value="14"   label="API Endpoints" />
             <StatPill value="Live" label="Deployed" />
           </div>
         </div>
@@ -378,7 +380,7 @@ export default function Home() {
               onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(56,189,248,0.4)")}>
               SAMEER NADEEM
             </a>
-            {" "}// SciPeerAI v1.6.0 // 12 MODULES // BUILDING INTELLIGENCE
+            {" "}// SciPeerAI v1.7.0 // 13 MODULES // BUILDING INTELLIGENCE
           </div>
         </div>
 
