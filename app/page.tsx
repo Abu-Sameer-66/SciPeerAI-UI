@@ -9,7 +9,7 @@ import {
   RefreshCw, Sparkles
 } from "lucide-react";
 
-const API = "https://web-production-f526d.up.railway.app";
+const API = "https://abu-sameer-66-scipeerai-api.hf.space";
 
 interface Flag {
   flag_type: string;
