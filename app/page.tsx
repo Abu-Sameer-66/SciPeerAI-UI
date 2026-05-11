@@ -965,12 +965,11 @@
 // }
 
 
-
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import jsPDF from "jspdf";
 
 const API = "https://abu-sameer-66-scipeerai-api.hf.space";
 
@@ -1004,25 +1003,25 @@ interface PDFMeta {
 }
 
 const MODULES = [
-  { id: "statistics",       label: "Statistical Audit",      endpoint: "/api/v1/analyze/statistics",       desc: "p-hacking · sample size · round numbers",          phase: 1 },
-  { id: "methodology",      label: "Methodology Checker",    endpoint: "/api/v1/analyze/methodology",      desc: "causation · control groups · timeframe",            phase: 1 },
-  { id: "citations",        label: "Citation Integrity",     endpoint: "/api/v1/analyze/citations",        desc: "self-citation · unsupported claims",                phase: 1 },
-  { id: "reproducibility",  label: "Reproducibility Scan",   endpoint: "/api/v1/analyze/reproducibility",  desc: "code · data · ethics · preregistration",            phase: 1 },
-  { id: "novelty",          label: "Novelty Scorer",         endpoint: "/api/v1/analyze/novelty",          desc: "literature search · novelty estimation",            phase: 1 },
-  { id: "grim",             label: "GRIM Test",              endpoint: "/api/v1/analyze/grim",             desc: "impossible means · data fabrication",               phase: 1 },
-  { id: "sprite",           label: "SPRITE Test",            endpoint: "/api/v1/analyze/sprite",           desc: "impossible distributions · SD verification",        phase: 1 },
-  { id: "granularity",      label: "Granularity Analyzer",   endpoint: "/api/v1/analyze/granularity",      desc: "digit preference · Benford law · round numbers",    phase: 1 },
-  { id: "pcurve",           label: "P-Curve Analyzer",       endpoint: "/api/v1/analyze/pcurve",           desc: "publication bias · p-value clustering",             phase: 1 },
-  { id: "effect_size",      label: "Effect Size Validator",  endpoint: "/api/v1/analyze/effect_size",      desc: "Cohen d · power analysis · inflated effects",       phase: 1 },
-  { id: "retraction",       label: "Retraction Checker",     endpoint: "/api/v1/analyze/retraction",       desc: "retracted citations · CrossRef live API",           phase: 1 },
-  { id: "cartel",           label: "Citation Cartel",        endpoint: "/api/v1/analyze/cartel",           desc: "citation rings · network manipulation",             phase: 1 },
-  { id: "llm",              label: "LLM Detector",           endpoint: "/api/v1/analyze/llm",              desc: "AI-generated text · burstiness · phrases",          phase: 1 },
-  { id: "fraud_fingerprint",label: "Fraud Fingerprinting",   endpoint: "/api/v1/analyze/fraud_fingerprint",desc: "writing DNA · style shift · authorship anomaly",    phase: 5 },
-  { id: "temporal_anomaly", label: "Temporal Anomaly",       endpoint: "/api/v1/analyze/temporal_anomaly", desc: "citation paradox · false recency · timeline",       phase: 5 },
-  { id: "citation_dna",     label: "Citation DNA",           endpoint: "/api/v1/analyze/citation_dna",     desc: "network concentration · journal diversity",         phase: 5 },
-  { id: "data_fingerprint", label: "Data Fingerprint",       endpoint: "/api/v1/analyze/data_fingerprint", desc: "fabrication · terminal digit · impossible values",  phase: 5 },
-  { id: "peer_review",      label: "Peer Review Score",      endpoint: "/api/v1/analyze/peer_review",      desc: "fast acceptance · predatory signals · conflict",    phase: 5 },
-  { id: "ai_spectrum",      label: "AI-Human Spectrum",      endpoint: "/api/v1/analyze/ai_spectrum",      desc: "GPT-4 · Claude · Gemini attribution · ratio",       phase: 5 },
+  { id: "statistics",       label: "Statistical Audit",      endpoint: "/api/v1/analyze/statistics",       desc: "p-hacking · sample size · round numbers",         phase: 1 },
+  { id: "methodology",      label: "Methodology Checker",    endpoint: "/api/v1/analyze/methodology",      desc: "causation · control groups · timeframe",           phase: 1 },
+  { id: "citations",        label: "Citation Integrity",     endpoint: "/api/v1/analyze/citations",        desc: "self-citation · unsupported claims",               phase: 1 },
+  { id: "reproducibility",  label: "Reproducibility Scan",   endpoint: "/api/v1/analyze/reproducibility",  desc: "code · data · ethics · preregistration",           phase: 1 },
+  { id: "novelty",          label: "Novelty Scorer",         endpoint: "/api/v1/analyze/novelty",          desc: "literature search · novelty estimation",           phase: 1 },
+  { id: "grim",             label: "GRIM Test",              endpoint: "/api/v1/analyze/grim",             desc: "impossible means · data fabrication",              phase: 1 },
+  { id: "sprite",           label: "SPRITE Test",            endpoint: "/api/v1/analyze/sprite",           desc: "impossible distributions · SD verification",       phase: 1 },
+  { id: "granularity",      label: "Granularity Analyzer",   endpoint: "/api/v1/analyze/granularity",      desc: "digit preference · Benford law · round numbers",   phase: 1 },
+  { id: "pcurve",           label: "P-Curve Analyzer",       endpoint: "/api/v1/analyze/pcurve",           desc: "publication bias · p-value clustering",            phase: 1 },
+  { id: "effect_size",      label: "Effect Size Validator",  endpoint: "/api/v1/analyze/effect_size",      desc: "Cohen d · power analysis · inflated effects",      phase: 1 },
+  { id: "retraction",       label: "Retraction Checker",     endpoint: "/api/v1/analyze/retraction",       desc: "retracted citations · CrossRef live API",          phase: 1 },
+  { id: "cartel",           label: "Citation Cartel",        endpoint: "/api/v1/analyze/cartel",           desc: "citation rings · network manipulation",            phase: 1 },
+  { id: "llm",              label: "LLM Detector",           endpoint: "/api/v1/analyze/llm",              desc: "AI-generated text · burstiness · phrases",         phase: 1 },
+  { id: "fraud_fingerprint",label: "Fraud Fingerprinting",   endpoint: "/api/v1/analyze/fraud_fingerprint",desc: "writing DNA · style shift · authorship anomaly",   phase: 5 },
+  { id: "temporal_anomaly", label: "Temporal Anomaly",       endpoint: "/api/v1/analyze/temporal_anomaly", desc: "citation paradox · false recency · timeline",      phase: 5 },
+  { id: "citation_dna",     label: "Citation DNA",           endpoint: "/api/v1/analyze/citation_dna",     desc: "network concentration · journal diversity",        phase: 5 },
+  { id: "data_fingerprint", label: "Data Fingerprint",       endpoint: "/api/v1/analyze/data_fingerprint", desc: "fabrication · terminal digit · impossible values", phase: 5 },
+  { id: "peer_review",      label: "Peer Review Score",      endpoint: "/api/v1/analyze/peer_review",      desc: "fast acceptance · predatory signals · conflict",   phase: 5 },
+  { id: "ai_spectrum",      label: "AI-Human Spectrum",      endpoint: "/api/v1/analyze/ai_spectrum",      desc: "GPT-4 · Claude · Gemini attribution · ratio",      phase: 5 },
 ];
 
 const PHASE5_IDS = new Set(["fraud_fingerprint","temporal_anomaly","citation_dna","data_fingerprint","peer_review","ai_spectrum"]);
@@ -1150,11 +1149,7 @@ function StatPill({ value, label }: { value: string; label: string }) {
 function ScanLine() {
   return (
     <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden", borderRadius: 16 }}>
-      <div style={{
-        position: "absolute", left: 0, right: 0, height: "1px",
-        background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.15), transparent)",
-        animation: "scanline 4s linear infinite",
-      }} />
+      <div style={{ position: "absolute", left: 0, right: 0, height: "1px", background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.15), transparent)", animation: "scanline 4s linear infinite" }} />
     </div>
   );
 }
@@ -1168,18 +1163,189 @@ export default function Home() {
   const [step, setStep]           = useState("");
   const [stepIndex, setStepIndex] = useState(0);
 
-  const [mode, setMode]               = useState<"text" | "pdf">("text");
-  const [pdfFile, setPdfFile]         = useState<File | null>(null);
-  const [pdfLoading, setPdfLoading]   = useState(false);
-  const [pdfResults, setPdfResults]   = useState<Result[]>([]);
-  const [pdfMeta, setPdfMeta]         = useState<PDFMeta | null>(null);
-  const [pdfDone, setPdfDone]         = useState(false);
-  const [dragOver, setDragOver]       = useState(false);
-  const fileInputRef                  = useRef<HTMLInputElement>(null);
+  const [mode, setMode]             = useState<"text" | "pdf">("text");
+  const [pdfFile, setPdfFile]       = useState<File | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfResults, setPdfResults] = useState<Result[]>([]);
+  const [pdfMeta, setPdfMeta]       = useState<PDFMeta | null>(null);
+  const [pdfDone, setPdfDone]       = useState(false);
+  const [dragOver, setDragOver]     = useState(false);
+  const fileInputRef                = useRef<HTMLInputElement>(null);
 
   const [notice, setNotice] = useState("");
   const notify = (msg: string) => { setNotice(msg); setTimeout(() => setNotice(""), 4000); };
 
+  // ── PDF Report Generator ────────────────────────────────────────────────────
+  const generateReport = () => {
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const W = 210;
+    const margin = 18;
+    let y = 20;
+
+    const line = (text: string, size = 10, color = [255, 255, 255] as number[], bold = false) => {
+      doc.setFontSize(size);
+      doc.setTextColor(color[0], color[1], color[2]);
+      doc.setFont("courier", bold ? "bold" : "normal");
+      doc.text(text, margin, y);
+      y += size * 0.45;
+    };
+    const gap  = (n = 4) => { y += n; };
+    const rule = () => {
+      doc.setDrawColor(56, 189, 248);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, W - margin, y);
+      y += 6;
+    };
+
+    // background
+    doc.setFillColor(6, 10, 16);
+    doc.rect(0, 0, W, 297, "F");
+
+    // header
+    doc.setFillColor(13, 17, 27);
+    doc.rect(0, 0, W, 36, "F");
+    doc.setFontSize(22);
+    doc.setFont("courier", "bold");
+    doc.setTextColor(56, 189, 248);
+    doc.text("SciPeer", margin, 16);
+    const sw = doc.getTextWidth("SciPeer");
+    doc.setTextColor(255, 255, 255);
+    doc.text("AI", margin + sw, 16);
+    doc.setFontSize(8);
+    doc.setFont("courier", "normal");
+    doc.setTextColor(100, 120, 140);
+    doc.text("SCIENTIFIC INTEGRITY FORENSIC REPORT  //  v2.0.0  //  20-MODULE PIPELINE", margin, 24);
+    doc.setFontSize(7);
+    doc.text(`Generated: ${new Date().toUTCString()}`, margin, 30);
+    y = 44;
+
+    // paper meta
+    if (pdfMeta) {
+      doc.setFillColor(13, 17, 27);
+      doc.roundedRect(margin, y, W - margin * 2, 34, 2, 2, "F");
+      y += 6;
+      line("PAPER FORENSIC METADATA", 7, [56, 189, 248]);
+      gap(2);
+      line(pdfMeta.paper_title.slice(0, 60), 10, [255, 255, 255], true);
+      gap(2);
+      line(`Pages: ${pdfMeta.page_count}   Figures: ${pdfMeta.figure_count}   Size: ${pdfMeta.file_size_kb} KB`, 8, [160, 180, 200]);
+      gap(1);
+      line(`SHA-256: ${pdfMeta.sha256.slice(0, 48)}...`, 7, [100, 120, 140]);
+      y += 6;
+    }
+
+    rule();
+
+    // overall score
+    const ov    = activeResults.length ? activeResults.reduce((a, b) => a + b.risk_score, 0) / activeResults.length : 0;
+    const ovPct = Math.round(ov * 100);
+    const lvl   = ovPct >= 70 ? "CRITICAL" : ovPct >= 40 ? "HIGH" : ovPct >= 20 ? "MEDIUM" : "LOW";
+    const sc: [number, number, number] = lvl === "CRITICAL" ? [239, 68, 68] : lvl === "HIGH" ? [249, 115, 22] : lvl === "MEDIUM" ? [234, 179, 8] : [34, 197, 94];
+
+    doc.setFontSize(32);
+    doc.setFont("courier", "bold");
+    doc.setTextColor(...sc);
+    doc.text(`${ovPct}%`, margin, y + 10);
+    doc.setFontSize(9);
+    doc.setTextColor(...sc);
+    doc.text(lvl, margin, y + 18);
+    doc.setFontSize(8);
+    doc.setFont("courier", "normal");
+    doc.setTextColor(160, 180, 200);
+    doc.text(`AGGREGATE INTEGRITY SCORE  ·  ${activeResults.length} DIMENSIONS ANALYZED`, margin + 28, y + 10);
+    doc.text(`${activeResults.reduce((a, b) => a + b.flags_count, 0)} TOTAL ANOMALIES  ·  SciPeerAI v2.0.0`, margin + 28, y + 17);
+    y += 28;
+    rule();
+
+    // modules
+    line("DETAILED MODULE ANALYSIS", 8, [56, 189, 248], true);
+    gap(4);
+
+    activeResults.forEach((r, i) => {
+      if (y > 265) {
+        doc.addPage();
+        doc.setFillColor(6, 10, 16);
+        doc.rect(0, 0, W, 297, "F");
+        y = 20;
+      }
+      const rPct = Math.round(r.risk_score * 100);
+      const rLvl = r.risk_level?.toUpperCase() || "LOW";
+      const rc: [number, number, number] = rLvl === "CRITICAL" ? [239, 68, 68] : rLvl === "HIGH" ? [249, 115, 22] : rLvl === "MEDIUM" ? [234, 179, 8] : [34, 197, 94];
+
+      doc.setFillColor(13, 17, 27);
+      doc.roundedRect(margin, y, W - margin * 2, 26, 1, 1, "F");
+      y += 5;
+
+      doc.setFontSize(7);
+      doc.setFont("courier", "normal");
+      doc.setTextColor(56, 189, 248);
+      doc.text(`ANALYSIS — ${String(i + 1).padStart(2, "0")}`, margin + 3, y);
+
+      doc.setFontSize(9);
+      doc.setFont("courier", "bold");
+      doc.setTextColor(255, 255, 255);
+      doc.text(r.module, margin + 3, y + 6);
+
+      doc.setFontSize(9);
+      doc.setFont("courier", "bold");
+      doc.setTextColor(...rc);
+      doc.text(`${rPct}%  ${rLvl}`, W - margin - 30, y + 6);
+
+      doc.setFillColor(30, 40, 55);
+      doc.roundedRect(margin + 3, y + 10, W - margin * 2 - 6, 2, 0.5, 0.5, "F");
+      if (rPct > 0) {
+        doc.setFillColor(...rc);
+        doc.roundedRect(margin + 3, y + 10, (W - margin * 2 - 6) * (rPct / 100), 2, 0.5, 0.5, "F");
+      }
+
+      doc.setFontSize(7);
+      doc.setFont("courier", "normal");
+      doc.setTextColor(120, 140, 160);
+      const sl = doc.splitTextToSize(r.summary, W - margin * 2 - 6);
+      doc.text(sl[0] || "", margin + 3, y + 17);
+      y += 30;
+    });
+
+    // top flags
+    if (pdfMeta?.top_flags?.length) {
+      if (y > 240) { doc.addPage(); doc.setFillColor(6, 10, 16); doc.rect(0, 0, W, 297, "F"); y = 20; }
+      gap(2);
+      rule();
+      line("TOP INTEGRITY FLAGS", 8, [239, 68, 68], true);
+      gap(4);
+      pdfMeta.top_flags.forEach((f) => {
+        if (y > 270) { doc.addPage(); doc.setFillColor(6, 10, 16); doc.rect(0, 0, W, 297, "F"); y = 20; }
+        doc.setDrawColor(239, 68, 68);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y, margin, y + 8);
+        const fl = doc.splitTextToSize(f, W - margin * 2 - 6);
+        doc.setFontSize(7);
+        doc.setFont("courier", "normal");
+        doc.setTextColor(200, 180, 180);
+        doc.text(fl[0] || "", margin + 4, y + 5);
+        y += 10;
+      });
+    }
+
+    // footer on all pages
+    const pages = doc.getNumberOfPages();
+    for (let p = 1; p <= pages; p++) {
+      doc.setPage(p);
+      doc.setFillColor(13, 17, 27);
+      doc.rect(0, 285, W, 12, "F");
+      doc.setFontSize(6);
+      doc.setFont("courier", "normal");
+      doc.setTextColor(80, 100, 120);
+      doc.text("ENGINEERED BY SAMEER NADEEM  //  SciPeerAI v2.0.0  //  20 MODULES  //  180 TESTS", margin, 292);
+      doc.text(`Page ${p} of ${pages}`, W - margin, 292, { align: "right" });
+    }
+
+    const title = pdfMeta?.paper_title || "analysis";
+    doc.save(`SciPeerAI_Report_${title.replace(/\s+/g, "_").slice(0, 40)}.pdf`);
+    notify("Report downloaded successfully!");
+  };
+
+  // ── Text mode ───────────────────────────────────────────────────────────────
   const run = async () => {
     if (text.trim().length < 50) { notify("Minimum 50 characters required."); return; }
     setLoading(true); setResults([]); setDone(false); setStepIndex(0);
@@ -1211,6 +1377,7 @@ export default function Home() {
     notify("Integrity analysis complete — 20 dimensions processed.");
   };
 
+  // ── PDF mode ────────────────────────────────────────────────────────────────
   const runPDF = async () => {
     if (!pdfFile) { notify("Please select a PDF file first."); return; }
     setPdfLoading(true); setPdfResults([]); setPdfMeta(null); setPdfDone(false);
@@ -1272,7 +1439,6 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#060a10", color: "#fff", fontFamily: "system-ui, sans-serif" }}>
-
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1283,32 +1449,14 @@ export default function Home() {
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 2px; }
-        @keyframes scanline {
-          0% { top: -2px; }
-          100% { top: 100%; }
-        }
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 1; box-shadow: 0 0 8px #22c55e; }
-          50% { opacity: 0.4; box-shadow: 0 0 4px #22c55e; }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .module-card-enter { animation: fadeInUp 0.3s ease forwards; }
-        .glow-btn:hover:not(:disabled) {
-          background: rgba(56,189,248,0.15) !important;
-          box-shadow: 0 0 24px rgba(56,189,248,0.12), inset 0 0 24px rgba(56,189,248,0.04) !important;
-        }
-        .nav-link:hover { color: #38bdf8 !important; }
-        .module-grid-item:hover {
-          border-color: rgba(56,189,248,0.2) !important;
-          background: rgba(56,189,248,0.04) !important;
-        }
+        @keyframes scanline { 0% { top: -2px; } 100% { top: 100%; } }
+        @keyframes pulse-dot { 0%,100%{opacity:1;box-shadow:0 0 8px #22c55e} 50%{opacity:.4;box-shadow:0 0 4px #22c55e} }
+        @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .glow-btn:hover:not(:disabled) { background:rgba(56,189,248,0.15)!important; box-shadow:0 0 24px rgba(56,189,248,0.12)!important; }
+        .nav-link:hover { color:#38bdf8!important; }
+        .module-grid-item:hover { border-color:rgba(56,189,248,0.2)!important; background:rgba(56,189,248,0.04)!important; }
+        .dl-btn:hover { background:rgba(34,197,94,0.15)!important; box-shadow:0 0 20px rgba(34,197,94,0.1)!important; }
       `}</style>
 
       {notice && (
@@ -1319,7 +1467,7 @@ export default function Home() {
 
       <div style={{ maxWidth: 780, margin: "0 auto", padding: "0 24px 100px" }}>
 
-        {/* ── NAV ── */}
+        {/* NAV */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "28px 0 24px", borderBottom: "1px solid rgba(255,255,255,0.04)", marginBottom: 72 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", animation: "pulse-dot 2s ease-in-out infinite" }} />
@@ -1341,7 +1489,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── HERO ── */}
+        {/* HERO */}
         <div style={{ marginBottom: 80 }}>
           <div style={{ fontSize: 10, color: "rgba(56,189,248,0.5)", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 24 }}>
             /// PROTOCOL: SCIENTIFIC INTEGRITY ANALYSIS
@@ -1352,16 +1500,8 @@ export default function Home() {
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.35)", lineHeight: 1.8, maxWidth: 520, marginBottom: 40, fontFamily: "Space Mono, monospace", letterSpacing: "0.02em" }}>
             Upload a PDF or paste paper text. Receive a structured forensic integrity report across 20 independent analysis dimensions — in seconds.
           </p>
-
-          {/* Stats bar */}
-          <div style={{ display: "flex", gap: 0, padding: "24px 0", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.02), transparent)", pointerEvents: "none" }} />
-            {[
-              { value: "20",   label: "Modules" },
-              { value: "180",  label: "Tests" },
-              { value: "21",   label: "Endpoints" },
-              { value: "Live", label: "Deployed" },
-            ].map((s, i) => (
+          <div style={{ display: "flex", gap: 0, padding: "24px 0", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            {[{ value: "20", label: "Modules" }, { value: "180", label: "Tests" }, { value: "21", label: "Endpoints" }, { value: "Live", label: "Deployed" }].map((s, i) => (
               <div key={i} style={{ flex: 1, textAlign: "center", borderRight: i < 3 ? "1px solid rgba(255,255,255,0.05)" : "none", padding: "0 20px" }}>
                 <StatPill value={s.value} label={s.label} />
               </div>
@@ -1369,28 +1509,24 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── MODULE GRID ── */}
+        {/* MODULE GRID */}
         <div style={{ marginBottom: 56 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "Space Mono, monospace" }}>
-              ANALYSIS DIMENSIONS — 20 MODULES
-            </span>
-            <span style={{ fontSize: 9, color: "rgba(168,85,247,0.5)", letterSpacing: "0.2em", fontFamily: "Space Mono, monospace" }}>
-              ◈ PHASE V MODULES INCLUDED
-            </span>
+            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "Space Mono, monospace" }}>ANALYSIS DIMENSIONS — 20 MODULES</span>
+            <span style={{ fontSize: 9, color: "rgba(168,85,247,0.5)", letterSpacing: "0.2em", fontFamily: "Space Mono, monospace" }}>◈ PHASE V MODULES INCLUDED</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
             {MODULES.map((m, idx) => {
               const isNew = PHASE5_IDS.has(m.id);
               return (
-                <div key={m.id} className="module-grid-item" style={{ padding: "14px 16px", background: isNew ? "rgba(168,85,247,0.04)" : "rgba(255,255,255,0.02)", border: `1px solid ${isNew ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.05)"}`, borderRadius: 8, transition: "all 0.2s", cursor: "default" }}>
+                <div key={m.id} className="module-grid-item" style={{ padding: "14px 16px", background: isNew ? "rgba(168,85,247,0.04)" : "rgba(255,255,255,0.02)", border: `1px solid ${isNew ? "rgba(168,85,247,0.15)" : "rgba(255,255,255,0.05)"}`, borderRadius: 8, transition: "all 0.2s" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                     <div style={{ fontSize: 9, color: isNew ? "rgba(168,85,247,0.5)" : "rgba(56,189,248,0.4)", letterSpacing: "0.25em", fontFamily: "Space Mono, monospace" }}>
                       {isNew ? `PHASE V · ${String(idx + 1).padStart(2, "0")}` : `EXP ${String(idx + 1).padStart(2, "0")}`}
                     </div>
                     {isNew && <span style={{ fontSize: 7, color: "rgba(168,85,247,0.6)", letterSpacing: "0.2em", fontFamily: "Space Mono, monospace", border: "1px solid rgba(168,85,247,0.2)", padding: "1px 5px", borderRadius: 2 }}>NEW</span>}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 5, letterSpacing: "-0.01em" }}>{m.label}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 5 }}>{m.label}</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", lineHeight: 1.5 }}>{m.desc}</div>
                 </div>
               );
@@ -1398,19 +1534,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── MODE TABS ── */}
+        {/* MODE TABS */}
         <div style={{ marginBottom: 36 }}>
           <div style={{ display: "flex", marginBottom: 20, border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, overflow: "hidden" }}>
             {(["text", "pdf"] as const).map((m) => (
-              <button key={m} onClick={() => setMode(m)} style={{
-                flex: 1, padding: "13px 0",
-                background: mode === m ? "rgba(56,189,248,0.08)" : "transparent",
-                border: "none",
-                borderRight: m === "text" ? "1px solid rgba(255,255,255,0.06)" : "none",
-                color: mode === m ? "#38bdf8" : "rgba(255,255,255,0.25)",
-                fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase",
-                fontFamily: "Space Mono, monospace", cursor: "pointer", transition: "all 0.2s",
-              }}>
+              <button key={m} onClick={() => setMode(m)} style={{ flex: 1, padding: "13px 0", background: mode === m ? "rgba(56,189,248,0.08)" : "transparent", border: "none", borderRight: m === "text" ? "1px solid rgba(255,255,255,0.06)" : "none", color: mode === m ? "#38bdf8" : "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", cursor: "pointer", transition: "all 0.2s" }}>
                 {m === "text" ? "◈ TEXT INPUT" : "⬆ PDF UPLOAD"}
               </button>
             ))}
@@ -1420,31 +1548,20 @@ export default function Home() {
           {mode === "text" && (
             <div style={{ background: "rgba(8,12,20,0.98)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }}>
               <ScanLine />
-              <div style={{ fontSize: 9, color: "rgba(56,189,248,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 12 }}>
-                PAPER TEXT INPUT *
-              </div>
-              <textarea
-                value={text} onChange={(e) => setText(e.target.value)}
-                placeholder="Paste abstract, methods section, results, or full paper text here..."
-                rows={9}
+              <div style={{ fontSize: 9, color: "rgba(56,189,248,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 12 }}>PAPER TEXT INPUT *</div>
+              <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste abstract, methods section, results, or full paper text here..." rows={9}
                 style={{ width: "100%", resize: "vertical", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "14px 16px", color: "rgba(255,255,255,0.75)", fontSize: 12, lineHeight: 1.8, transition: "border-color 0.2s", fontFamily: "Space Mono, monospace" }}
                 onFocus={(e) => e.target.style.borderColor = "rgba(56,189,248,0.3)"}
-                onBlur={(e)  => e.target.style.borderColor = "rgba(255,255,255,0.06)"}
-              />
-              <div style={{ fontSize: 9, color: "rgba(56,189,248,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 12, marginTop: 20 }}>
-                AUTHOR NAME — OPTIONAL, SELF-CITATION DETECTION
-              </div>
+                onBlur={(e)  => e.target.style.borderColor = "rgba(255,255,255,0.06)"} />
+              <div style={{ fontSize: 9, color: "rgba(56,189,248,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 12, marginTop: 20 }}>AUTHOR NAME — OPTIONAL</div>
               <input value={author} onChange={(e) => setAuthor(e.target.value)} placeholder="e.g. Sameer Nadeem"
                 style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "12px 16px", color: "rgba(255,255,255,0.75)", fontSize: 12, transition: "border-color 0.2s", fontFamily: "Space Mono, monospace" }}
                 onFocus={(e) => e.target.style.borderColor = "rgba(56,189,248,0.3)"}
-                onBlur={(e)  => e.target.style.borderColor = "rgba(255,255,255,0.06)"}
-              />
-
-              {/* progress bar when loading */}
+                onBlur={(e)  => e.target.style.borderColor = "rgba(255,255,255,0.06)"} />
               {loading && (
                 <div style={{ marginTop: 20, padding: "14px 16px", background: "rgba(56,189,248,0.04)", border: "1px solid rgba(56,189,248,0.1)", borderRadius: 8 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ fontSize: 10, color: "rgba(56,189,248,0.6)", fontFamily: "Space Mono, monospace", letterSpacing: "0.1em" }}>⟳ {step}</span>
+                    <span style={{ fontSize: 10, color: "rgba(56,189,248,0.6)", fontFamily: "Space Mono, monospace" }}>⟳ {step}</span>
                     <span style={{ fontSize: 10, color: "rgba(56,189,248,0.4)", fontFamily: "Space Mono, monospace" }}>{stepIndex}/{MODULES.length}</span>
                   </div>
                   <div style={{ height: 2, background: "rgba(56,189,248,0.1)", borderRadius: 1, overflow: "hidden" }}>
@@ -1452,7 +1569,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
               <button onClick={run} disabled={loading} className="glow-btn"
                 style={{ width: "100%", marginTop: 16, padding: "15px 24px", background: loading ? "rgba(255,255,255,0.02)" : "rgba(56,189,248,0.08)", border: `1px solid ${loading ? "rgba(255,255,255,0.04)" : "rgba(56,189,248,0.25)"}`, borderRadius: 8, color: loading ? "rgba(255,255,255,0.2)" : "#38bdf8", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", cursor: loading ? "not-allowed" : "pointer", fontFamily: "Space Mono, monospace", transition: "all 0.2s", position: "relative", overflow: "hidden" }}>
                 {!loading && <div style={{ position: "absolute", top: 0, left: "-100%", right: 0, bottom: 0, background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.06), transparent)", animation: "shimmer 3s infinite" }} />}
@@ -1465,56 +1581,36 @@ export default function Home() {
           {mode === "pdf" && (
             <div style={{ background: "rgba(8,12,20,0.98)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 14, padding: 28, position: "relative", overflow: "hidden" }}>
               <ScanLine />
-              <div
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={onDrop}
-                onClick={() => fileInputRef.current?.click()}
+              <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={onDrop} onClick={() => fileInputRef.current?.click()}
                 style={{ border: `2px dashed ${dragOver ? "rgba(56,189,248,0.5)" : pdfFile ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, padding: "44px 24px", textAlign: "center", cursor: "pointer", background: dragOver ? "rgba(56,189,248,0.03)" : pdfFile ? "rgba(34,197,94,0.02)" : "rgba(0,0,0,0.3)", transition: "all 0.2s", marginBottom: 20 }}>
                 <input ref={fileInputRef} type="file" accept=".pdf" onChange={onFileChange} style={{ display: "none" }} />
                 {pdfFile ? (
-                  <>
-                    <div style={{ fontSize: 28, marginBottom: 10 }}>📄</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e", fontFamily: "Space Mono, monospace", marginBottom: 6 }}>{pdfFile.name}</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: "Space Mono, monospace" }}>{(pdfFile.size / 1024).toFixed(1)} KB · CLICK TO CHANGE FILE</div>
-                  </>
+                  <><div style={{ fontSize: 28, marginBottom: 10 }}>📄</div><div style={{ fontSize: 12, fontWeight: 700, color: "#22c55e", fontFamily: "Space Mono, monospace", marginBottom: 6 }}>{pdfFile.name}</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: "Space Mono, monospace" }}>{(pdfFile.size / 1024).toFixed(1)} KB · CLICK TO CHANGE FILE</div></>
                 ) : (
-                  <>
-                    <div style={{ fontSize: 28, marginBottom: 10, opacity: 0.4 }}>⬆</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", fontFamily: "Space Mono, monospace", marginBottom: 8, letterSpacing: "0.1em" }}>DROP PDF OR CLICK TO BROWSE</div>
-                    <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", fontFamily: "Space Mono, monospace" }}>MAX 50MB · SELECTABLE TEXT PDF REQUIRED</div>
-                  </>
+                  <><div style={{ fontSize: 28, marginBottom: 10, opacity: 0.4 }}>⬆</div><div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", fontFamily: "Space Mono, monospace", marginBottom: 8, letterSpacing: "0.1em" }}>DROP PDF OR CLICK TO BROWSE</div><div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", fontFamily: "Space Mono, monospace" }}>MAX 50MB · SELECTABLE TEXT PDF REQUIRED</div></>
                 )}
               </div>
-
-              <div style={{ padding: "10px 16px", background: "rgba(56,189,248,0.03)", border: "1px solid rgba(56,189,248,0.08)", borderRadius: 6, marginBottom: 16, fontSize: 10, color: "rgba(56,189,248,0.4)", fontFamily: "Space Mono, monospace", letterSpacing: "0.05em" }}>
+              <div style={{ padding: "10px 16px", background: "rgba(56,189,248,0.03)", border: "1px solid rgba(56,189,248,0.08)", borderRadius: 6, marginBottom: 16, fontSize: 10, color: "rgba(56,189,248,0.4)", fontFamily: "Space Mono, monospace" }}>
                 🔒 SHA-256 FINGERPRINTED · FILES NOT STORED · 20-MODULE FORENSIC PIPELINE
               </div>
-
               {pdfLoading && (
                 <div style={{ marginBottom: 16, padding: "14px 16px", background: "rgba(56,189,248,0.04)", border: "1px solid rgba(56,189,248,0.1)", borderRadius: 8 }}>
-                  <span style={{ fontSize: 10, color: "rgba(56,189,248,0.6)", fontFamily: "Space Mono, monospace", letterSpacing: "0.1em" }}>⟳ {step}</span>
+                  <span style={{ fontSize: 10, color: "rgba(56,189,248,0.6)", fontFamily: "Space Mono, monospace" }}>⟳ {step}</span>
                 </div>
               )}
-
               <button onClick={runPDF} disabled={pdfLoading || !pdfFile} className="glow-btn"
                 style={{ width: "100%", padding: "15px 24px", background: pdfLoading || !pdfFile ? "rgba(255,255,255,0.02)" : "rgba(56,189,248,0.08)", border: `1px solid ${pdfLoading || !pdfFile ? "rgba(255,255,255,0.04)" : "rgba(56,189,248,0.25)"}`, borderRadius: 8, color: pdfLoading || !pdfFile ? "rgba(255,255,255,0.2)" : "#38bdf8", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", cursor: pdfLoading || !pdfFile ? "not-allowed" : "pointer", fontFamily: "Space Mono, monospace", transition: "all 0.2s", position: "relative", overflow: "hidden" }}>
                 {!pdfLoading && pdfFile && <div style={{ position: "absolute", top: 0, left: "-100%", right: 0, bottom: 0, background: "linear-gradient(90deg, transparent, rgba(56,189,248,0.06), transparent)", animation: "shimmer 3s infinite" }} />}
-                {pdfLoading ? `⟳ FORENSIC ANALYSIS RUNNING...` : "EXECUTE 20-MODULE FORENSIC SCAN ◈"}
+                {pdfLoading ? "⟳ FORENSIC ANALYSIS RUNNING..." : "EXECUTE 20-MODULE FORENSIC SCAN ◈"}
               </button>
-
               {pdfDone && pdfMeta && (
                 <div style={{ marginTop: 24, padding: "22px", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10 }}>
                   <div style={{ fontSize: 9, color: "rgba(56,189,248,0.5)", letterSpacing: "0.3em", fontFamily: "Space Mono, monospace", marginBottom: 14 }}>PAPER FORENSIC METADATA</div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 16, letterSpacing: "-0.01em" }}>{pdfMeta.paper_title}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 16 }}>{pdfMeta.paper_title}</div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 16 }}>
-                    {[
-                      { label: "PAGES",   value: pdfMeta.page_count },
-                      { label: "FIGURES", value: pdfMeta.figure_count },
-                      { label: "SIZE KB", value: pdfMeta.file_size_kb },
-                    ].map(({ label, value }) => (
+                    {[{ label: "PAGES", value: pdfMeta.page_count }, { label: "FIGURES", value: pdfMeta.figure_count }, { label: "SIZE KB", value: pdfMeta.file_size_kb }].map(({ label, value }) => (
                       <div key={label} style={{ textAlign: "center", padding: "12px", background: "rgba(56,189,248,0.04)", borderRadius: 6, border: "1px solid rgba(56,189,248,0.08)" }}>
-                        <div style={{ fontSize: 20, fontWeight: 900, color: "#38bdf8", fontFamily: "Space Mono, monospace", letterSpacing: "-0.03em" }}>{value}</div>
+                        <div style={{ fontSize: 20, fontWeight: 900, color: "#38bdf8", fontFamily: "Space Mono, monospace" }}>{value}</div>
                         <div style={{ fontSize: 8, color: "rgba(255,255,255,0.25)", letterSpacing: "0.25em", marginTop: 4, fontFamily: "Space Mono, monospace" }}>{label}</div>
                       </div>
                     ))}
@@ -1530,16 +1626,16 @@ export default function Home() {
                       ))}
                     </div>
                   )}
-                  <div style={{ fontSize: 9, color: "rgba(255,255,255,0.15)", fontFamily: "Space Mono, monospace", marginTop: 14, letterSpacing: "0.1em" }}>{pdfMeta.analyzed_by}</div>
+                  <div style={{ fontSize: 9, color: "rgba(255,255,255,0.15)", fontFamily: "Space Mono, monospace", marginTop: 14 }}>{pdfMeta.analyzed_by}</div>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* ── OVERALL SCORE ── */}
+        {/* OVERALL SCORE */}
         {activeDone && activeResults.length > 0 && (
-          <div style={{ background: "rgba(8,12,20,0.98)", border: `1px solid ${overallColor}18`, borderRadius: 14, padding: 32, marginBottom: 20, position: "relative", overflow: "hidden" }}>
+          <div style={{ background: "rgba(8,12,20,0.98)", border: `1px solid ${overallColor}18`, borderRadius: 14, padding: 32, marginBottom: 16, position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, right: 0, width: 300, height: 300, background: `radial-gradient(circle at top right, ${overallColor}06 0%, transparent 60%)`, pointerEvents: "none" }} />
             <div style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 24 }}>
               AGGREGATE INTEGRITY ASSESSMENT — {activeResults.length} DIMENSIONS
@@ -1550,8 +1646,8 @@ export default function Home() {
                   {Math.round(overall * 100)}%
                 </div>
                 <Badge level={overallLevel} />
-                <div style={{ marginTop: 12, fontSize: 10, color: "rgba(255,255,255,0.2)", fontFamily: "Space Mono, monospace", letterSpacing: "0.05em", maxWidth: 220, lineHeight: 1.6 }}>
-                  {overallLevel === "low" ? "No major integrity concerns detected across all analysis dimensions." : overallLevel === "medium" ? "Some integrity signals require attention before publication." : "Significant integrity concerns detected. Expert review required."}
+                <div style={{ marginTop: 12, fontSize: 10, color: "rgba(255,255,255,0.2)", fontFamily: "Space Mono, monospace", maxWidth: 220, lineHeight: 1.6 }}>
+                  {overallLevel === "low" ? "No major integrity concerns detected." : overallLevel === "medium" ? "Some signals require attention before publication." : "Significant concerns detected. Expert review required."}
                 </div>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 220, maxWidth: 280 }}>
@@ -1572,6 +1668,14 @@ export default function Home() {
           </div>
         )}
 
+        {/* DOWNLOAD REPORT BUTTON */}
+        {activeDone && activeResults.length > 0 && (
+          <button onClick={generateReport} className="dl-btn"
+            style={{ width: "100%", marginBottom: 20, padding: "14px 24px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 8, color: "#22c55e", fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", cursor: "pointer", fontFamily: "Space Mono, monospace", transition: "all 0.2s" }}>
+            ↓ DOWNLOAD FORENSIC REPORT — PDF
+          </button>
+        )}
+
         {activeDone && activeResults.length > 0 && (
           <div style={{ fontSize: 9, color: "rgba(255,255,255,0.18)", letterSpacing: "0.35em", textTransform: "uppercase", fontFamily: "Space Mono, monospace", marginBottom: 16 }}>
             DETAILED FORENSIC REPORT — MODULE BY MODULE
@@ -1582,7 +1686,7 @@ export default function Home() {
           <ModuleCard key={i} r={r} index={i} isPhase5={PHASE5_IDS.has(MODULES.find(m => m.label === r.module)?.id || "")} />
         ))}
 
-        {/* ── FOOTER ── */}
+        {/* FOOTER */}
         <div style={{ textAlign: "center", marginTop: 80, paddingTop: 28, borderTop: "1px solid rgba(255,255,255,0.03)" }}>
           <div style={{ fontSize: 9, color: "rgba(255,255,255,0.12)", fontFamily: "Space Mono, monospace", letterSpacing: "0.2em", lineHeight: 2 }}>
             ENGINEERED BY{" "}
